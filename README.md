@@ -32,6 +32,20 @@ stripe:
 
 Once you have added these, you should restart your server to ensure they are loaded.
 
+### Setting up javascript
+
+The module comes with a jQuery form handler which requires jQuery.
+
+In your `application.js` file you should include the Shoppe Stripe form handler as
+shown below:
+
+```
+#= require shoppe/stripe/form_handler
+```
+
+Also, on your payment page, you should call the `shoppe_stripe_javascript` helper to
+include the Stripe.js document and set your Stripe API key. 
+
 ### Setting up your payment form
 
 Stripe works by submitting cards details submitted by your users to their servers using
@@ -59,36 +73,22 @@ fraud checks.
 * address_zip
 * address_country
 
-For example:
-
-```html
-<form action='/payment' method='post' class='stripeForm'>
-  <input type='text' data-stripe='number' placeholder='XXXX XXXX XXXX XXXX'>
-  <input type='text' data-stripe='exp_month' placeholder='MM'>
-  <input type='text' data-stripe='exp_year' placeholder='YYYY'>
-</form>
-```
-
 In addition to fields for card details, you should also include a hidden field with the
 `token` value in the `data-stripe` attribute.
 
 ```html
-<input type='hidden' name='stripe_token' data-stripe='token' />
+<form action='/payment' method='post' class='stripeForm'>
+  <input type='hidden' name='stripe_token' data-stripe='token' />
+  <input type='text' data-stripe='number' placeholder='XXXX XXXX XXXX XXXX'>
+  <input type='text' data-stripe='exp_month' placeholder='MM'>
+  <input type='text' data-stripe='exp_year' placeholder='YYYY'>
+  <input type="submit" value="Continue">
+</form>
 ```
 
-### Configuring Javascript
-
-The module comes with a jQuery form handler. Be sure that your form has the `stripeForm`
-class and that jQuery has been loaded.
-
-In your `application.js` file you should include the Shoppe Stripe form handler:
-
-```
-#= require shoppe/stripe/form_handler
-```
-
-Also, on your payment page, you should call the `shoppe_stripe_javascript` helper to
-include the Stripe.js document and set your Stripe API key. 
+The example above will display fields for number & expiry plus a submit button.
+However, the endpoint (/payment) will simply receive a `stripe_token` parameter which
+will contain a token which must be 
 
 ### Receiving your payment token
 
