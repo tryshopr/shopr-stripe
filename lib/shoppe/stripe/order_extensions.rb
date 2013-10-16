@@ -2,7 +2,7 @@ module Shoppe
   module Stripe
     module OrderExtensions
       
-      def set_stripe_token(token)
+      def accept_stripe_token(token)
         if token =~ /\Atok/
           customer = ::Stripe::Customer.create(:description => "Customer for order #{number}", :card => token)
           self.properties['stripe_customer_token'] = customer.id
