@@ -1,6 +1,4 @@
-require 'stripe'
 require 'shoppe/stripe/version'
-require 'shoppe/stripe/order_extensions'
 require 'shoppe/stripe/railtie'
 
 module Shoppe
@@ -19,7 +17,8 @@ module Shoppe
       def setup
         require 'stripe'
         ::Stripe.api_key = self.api_key
-        
+
+        require 'shoppe/stripe/order_extensions'
         Shoppe::Order.send :include, Shoppe::Stripe::OrderExtensions
         
         # When an order is confirmed, attempt to authorise the payment
