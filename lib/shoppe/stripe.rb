@@ -15,6 +15,9 @@ module Shoppe
       end
       
       def setup
+        # Validate the configuration file to ensure stripe has been configured.
+        Shoppe.validate_live_config({'stripe' => ['api_key', 'publishable_key', 'currency']})
+        
         require 'stripe'
         ::Stripe.api_key = self.api_key
 
