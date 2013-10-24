@@ -16,9 +16,7 @@ module Shoppe
       
       def setup
         Shoppe.add_settings_group :stripe, [:stripe_api_key, :stripe_publishable_key, :stripe_currency]
-        
         require 'stripe'
-
         require 'shoppe/stripe/order_extensions'
         Shoppe::Order.send :include, Shoppe::Stripe::OrderExtensions
         
