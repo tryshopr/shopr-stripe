@@ -7,19 +7,17 @@ module Shoppe
     class << self
       
       def api_key
-        Shoppe.config['stripe']['api_key']
+        Shoppe.settings.stripe_api_key
       end
       
       def publishable_key
-        Shoppe.config['stripe']['publishable_key']
+        Shoppe.settings.stripe_publishable_key
       end
       
       def setup
-        # Validate the configuration file to ensure stripe has been configured.
-        Shoppe.validate_live_config({'stripe' => ['api_key', 'publishable_key', 'currency']})
+        Shoppe.add_settings_group :stripe, [:stripe_api_key, :stripe_publishable_key, :stripe_currency]
         
         require 'stripe'
-        ::Stripe.api_key = self.api_key
 
         require 'shoppe/stripe/order_extensions'
         Shoppe::Order.send :include, Shoppe::Stripe::OrderExtensions
@@ -28,7 +26,7 @@ module Shoppe
         Shoppe::Order.before_confirmation do
           if self.properties['stripe_customer_token']
             begin
-              charge = ::Stripe::Charge.create(:customer => self.properties['stripe_customer_token'], :amount => self.total_in_pence, :currency => Shoppe.config['stripe']['currency'], :capture => false)
+              charge = ::Stripe::Charge.create({:customer => self.properties['stripe_customer_token'], :amount => self.total_in_pence, :currency => Shoppe.settings.stripe_currency, :capture => false}, Shoppe.settings.stripe_api_key)
               self.paid_at = Time.now
               self.payment_method = 'Stripe'
               self.payment_reference = charge.id
