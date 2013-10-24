@@ -1,6 +1,6 @@
 module Shoppe
   module Stripe
-    class Railtie < Rails::Engine
+    class Engine < Rails::Engine
       
       initializer "shoppe.stripe.initializer" do
         Shoppe::Stripe.setup

@@ -1,5 +1,5 @@
 require 'shoppe/stripe/version'
-require 'shoppe/stripe/railtie'
+require 'shoppe/stripe/engine'
 
 module Shoppe
   module Stripe
