@@ -15,19 +15,25 @@ module Shoppe
       end
       
       def setup
+        # Set the configuration which we would like
         Shoppe.add_settings_group :stripe, [:stripe_api_key, :stripe_publishable_key, :stripe_currency]
+        
+        # Require the external Stripe library
         require 'stripe'
+        
+        # Extend Shoppe Order & Payment classess
         require 'shoppe/stripe/order_extensions'
         Shoppe::Order.send :include, Shoppe::Stripe::OrderExtensions
+
+        require 'shoppe/stripe/payment_extensions'
+        Shoppe::Payment.send :include, Shoppe::Stripe::PaymentExtensions
         
         # When an order is confirmed, attempt to authorise the payment
         Shoppe::Order.before_confirmation do
           if self.properties['stripe_customer_token']
             begin
-              charge = ::Stripe::Charge.create({:customer => self.properties['stripe_customer_token'], :amount => self.total_in_pence, :currency => Shoppe.settings.stripe_currency, :capture => false}, Shoppe.settings.stripe_api_key)
-              self.paid_at = Time.now
-              self.payment_method = 'Stripe'
-              self.payment_reference = charge.id
+              charge = ::Stripe::Charge.create({:customer => self.properties['stripe_customer_token'], :amount => (self.total * BigDecimal(100)).to_i, :currency => Shoppe.settings.stripe_currency, :capture => false}, Shoppe.settings.stripe_api_key)
+              self.payments.create(:amount => self.total, :method => 'Stripe', :reference => charge.id, :refundable => true, :confirmed => false)
             rescue ::Stripe::CardError
               raise Shoppe::Errors::PaymentDeclined, "Payment was declined by the payment processor."
             end
@@ -36,27 +42,50 @@ module Shoppe
         
         # When an order is accepted, attempt to capture the payment
         Shoppe::Order.before_acceptance do
-          if stripe_charge
+          self.payments.where(:confirmed => false, :method => 'Stripe').each do |payment|
             begin
-              stripe_charge.capture
-            rescue ::Stripe::Error
-              raise Shoppe::Errors::PaymentDeclined, "Payment could not be captured by Stripe. Investigate with Stripe. Do not accept the order."
+              payment.stripe_charge.capture
+              payment.update_attribute(:confirmed, true)
+            rescue ::Stripe::CardError
+              raise Shoppe::Errors::PaymentDeclined, "Payment ##{payment.id} could not be captured by Stripe. Investigate with Stripe. Do not accept the order."
             end
           end
         end
         
-        # When an order is rejected, attempt to refund the payment
+        # When an order is rejected, attempt to refund all the payments which have been 
+        # created with Stripe and are not confirmed.
         Shoppe::Order.before_rejection do
-          if stripe_charge
+          self.payments.where(:confirmed => false, :method => 'Stripe').each do |payment|
+            payment.refund!(payment.refundable_amount)
+          end
+        end
+        
+        # When a new payment is added which is a refund and associated with another Stripe method, 
+        # attempt to refund it automatically.
+        Shoppe::Payment.before_create do
+          if self.refund? && self.parent && self.parent.method == 'Stripe'
             begin
-              stripe_charge.refund
-            rescue ::Stripe::Error
-              raise Shoppe::Errors::PaymentDeclined, "Payment could not be captured by Stripe. Investigate with Stripe. Do not accept the order."
+              options = {}
+              if self.parent.confirmed?
+                options[:amount] = (self.amount * BigDecimal(100)).to_i.abs
+              else
+                # If the original item hasn't been captured and the amount refunded isn't the
+                # same as the orignal value, raise an error.
+                if self.amount.abs != self.parent.refundable_amount
+                  raise Shoppe::Errors::RefundFailed, :message => "Refund could not be processed because charge hasn't been captured and the amount is not the same as the original payment."
+                end
+              end
+              refund = self.parent.stripe_charge.refund(options)
+              self.method = 'Stripe'
+              self.reference = refund.id
+              true
+            rescue ::Stripe::CardError
+              raise Shoppe::Errors::RefundFailed, :message => "Refund could not be processed with Stripe. Please investigate with Stripe."
             end
           end
         end
+        
       end
-      
     end
   end
 end

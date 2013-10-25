@@ -27,11 +27,6 @@ module Shoppe
         @stripe_card ||= stripe_customer.cards.last
       end
       
-      def stripe_charge
-        return false unless self.paid? && self.payment_method == 'Stripe'
-        @stripe_charge ||= ::Stripe::Charge.retrieve(self.payment_reference, Shoppe.settings.stripe_api_key)
-      end
-      
     end
   end
 end
