@@ -79,8 +79,8 @@ module Shoppe
               self.method = 'Stripe'
               self.reference = refund.id
               true
-            rescue ::Stripe::CardError
-              raise Shoppe::Errors::RefundFailed, :message => "Refund could not be processed with Stripe. Please investigate with Stripe."
+            rescue ::Stripe::CardError, ::Stripe::InvalidRequestError => e
+              raise Shoppe::Errors::RefundFailed, :message => "Refund could not be processed with Stripe (#{e.class}: #{e.message}). Please investigate with Stripe."
             end
           end
         end
