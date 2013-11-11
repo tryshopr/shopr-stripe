@@ -15,5 +15,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency "shoppe", "~> 0.0.9"
   s.add_dependency "stripe", "~> 1.8.7"
-  s.add_dependency "coffee-rails", "~> 4.0.0w"
+  s.add_dependency "coffee-rails", "~> 4.0.0"
 end
