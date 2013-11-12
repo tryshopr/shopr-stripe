@@ -32,7 +32,7 @@ module Shoppe
         Shoppe::Order.before_confirmation do
           if self.properties['stripe_customer_token']
             begin
-              charge = ::Stripe::Charge.create({:customer => self.properties['stripe_customer_token'], :amount => (self.total * BigDecimal(100)).to_i, :currency => Shoppe.settings.stripe_currency, :capture => false}, Shoppe.settings.stripe_api_key)
+              charge = ::Stripe::Charge.create({:customer => self.properties['stripe_customer_token'], :amount => (self.total * BigDecimal(100)).round, :currency => Shoppe.settings.stripe_currency, :capture => false}, Shoppe.settings.stripe_api_key)
               self.payments.create(:amount => self.total, :method => 'Stripe', :reference => charge.id, :refundable => true, :confirmed => false)
             rescue ::Stripe::CardError
               raise Shoppe::Errors::PaymentDeclined, "Payment was declined by the payment processor."
@@ -67,7 +67,7 @@ module Shoppe
             begin
               options = {}
               if self.parent.confirmed?
-                options[:amount] = (self.amount * BigDecimal(100)).to_i.abs
+                options[:amount] = (self.amount * BigDecimal(100)).round.abs
               else
                 # If the original item hasn't been captured and the amount refunded isn't the
                 # same as the orignal value, raise an error.
