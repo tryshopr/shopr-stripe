@@ -1,6 +1,9 @@
 require 'shoppe/stripe/version'
 require 'shoppe/stripe/engine'
 
+require 'shoppe/stripe/order_extensions'
+require 'shoppe/stripe/payment_extensions'
+
 module Shoppe
   module Stripe
     
@@ -20,13 +23,6 @@ module Shoppe
         
         # Require the external Stripe library
         require 'stripe'
-        
-        # Extend Shoppe Order & Payment classess
-        require 'shoppe/stripe/order_extensions'
-        Shoppe::Order.send :include, Shoppe::Stripe::OrderExtensions
-
-        require 'shoppe/stripe/payment_extensions'
-        Shoppe::Payment.send :include, Shoppe::Stripe::PaymentExtensions
         
         # When an order is confirmed, attempt to authorise the payment
         Shoppe::Order.before_confirmation do

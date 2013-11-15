@@ -10,6 +10,11 @@ module Shoppe
         end
       end
       
+      config.to_prepare do
+        Shoppe::Order.send :include, Shoppe::Stripe::OrderExtensions
+        Shoppe::Payment.send :include, Shoppe::Stripe::PaymentExtensions
+      end
+      
     end
   end
 end
