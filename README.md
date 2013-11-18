@@ -20,17 +20,8 @@ gem 'shoppe-stripe', :require => 'shoppe/stripe'
 
 ### Configurating
 
-The application requires three configuration options to be added to your `shoppe.yml`
-configuraton file.
-
-```yaml
-stripe:
-  api_key: sk_test_Ld1xn6xxxxxxNkVoB2
-  publishable_key: pk_test_DU0KpUvSxxxxxxxxCpK7z9v
-  currency: GBP
-```
-
-Once you have added these, you should restart your server to ensure they are loaded.
+One the gem has been included, you can add your Stripe configuration details through the
+Settings page in the Shoppe admin interface.
 
 ### Setting up javascript
 
