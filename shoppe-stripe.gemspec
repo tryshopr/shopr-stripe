@@ -11,9 +11,9 @@ Gem::Specification.new do |s|
   s.summary     = "A Stripe module for Shoppe."
   s.description = "A Stripe module to assist with the integration of Stripe."
 
-  s.files = Dir["{lib,vendor}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{lib,vendor}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
   s.add_dependency "shoppe", "> 0.0.9", "< 2"
   s.add_dependency "stripe", "~> 1.8.7"
-  s.add_dependency "coffee-rails", "~> 4.0.0"
+  s.add_dependency "coffee-rails", "~> 4"
 end
