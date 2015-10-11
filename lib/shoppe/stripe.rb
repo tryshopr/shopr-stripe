@@ -26,7 +26,7 @@ module Shoppe
         
         # When an order is confirmed, attempt to authorise the payment
         Shoppe::Order.before_confirmation do
-          if self.properties['stripe_customer_token']
+          if self.properties['stripe_customer_token'] && self.total > 0.0
             begin
               charge = ::Stripe::Charge.create({:customer => self.properties['stripe_customer_token'], :amount => (self.total * BigDecimal(100)).round, :currency => Shoppe.settings.stripe_currency, :capture => false}, Shoppe.settings.stripe_api_key)
               self.payments.create(:amount => self.total, :method => 'Stripe', :reference => charge.id, :refundable => true, :confirmed => false)
