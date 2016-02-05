@@ -15,7 +15,7 @@ Shoppe store. If you have any questions, please just
 To install the Shoppe Stripe module, just add it to your Gemfile and run `bundle`.
 
 ```ruby
-gem 'shoppe-stripe', :require => 'shoppe/stripe'
+gem "shoppe-stripe", require: "shoppe/stripe"
 ```
 
 For the latest up to date documentation, please see the [Shoppe tutorial page](http://tryshoppe.com/docs/payment-gateways/stripe).
