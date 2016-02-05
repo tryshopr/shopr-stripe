@@ -10,11 +10,11 @@ module Shoppe
     class << self
       
       def api_key
-        Shoppe.settings.stripe_api_key
+        ENV["STRIPE_API_KEY"] || Shoppe.settings.stripe_api_key
       end
       
       def publishable_key
-        Shoppe.settings.stripe_publishable_key
+        ENV["STRIPE_PUBLISHABLE_KEY"] || Shoppe.settings.stripe_publishable_key
       end
       
       def setup
