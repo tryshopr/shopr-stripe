@@ -4,7 +4,7 @@ module Shoppe
       
       def accept_stripe_token(token)
         if token =~ /\Atok/
-          customer = ::Stripe::Customer.create({:description => "Customer for order #{number}", :card => token}, Shoppe.settings.stripe_api_key)
+          customer = ::Stripe::Customer.create({:description => "Customer for order #{number}", :card => token}, Shoppe::Stripe.api_key)
           self.properties['stripe_customer_token'] = customer.id
           self.save
         elsif token =~ /\Acus/ && self.properties[:stripe_customer_token] != token
@@ -20,7 +20,7 @@ module Shoppe
       private
       
       def stripe_customer
-        @stripe_customer ||= ::Stripe::Customer.retrieve(self.properties['stripe_customer_token'], Shoppe.settings.stripe_api_key)
+        @stripe_customer ||= ::Stripe::Customer.retrieve(self.properties['stripe_customer_token'], Shoppe::Stripe.api_key)
       end
       
       def stripe_card
