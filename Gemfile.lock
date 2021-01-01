@@ -259,7 +259,7 @@ GEM
       rubyzip
       spreadsheet (> 0.6.4)
     ruby-ole (1.2.12)
-    rubyzip (1.1.7)
+    rubyzip (2.3.0)
     shoppe (1.1.2)
       awesome_nested_set (~> 3.0.2)
       bcrypt (>= 3.1.2, < 3.2)
