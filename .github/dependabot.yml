@@ -1,0 +1,20 @@
+version: 2
+updates:
+- package-ecosystem: bundler
+  directory: "/"
+  schedule:
+    interval: monthly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: nokogiri
+    versions:
+    - 1.11.0
+  - dependency-name: excon
+    versions:
+    - 0.78.1
+  - dependency-name: loofah
+    versions:
+    - 2.8.0
+  - dependency-name: rake
+    versions:
+    - 13.0.1
